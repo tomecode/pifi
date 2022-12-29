@@ -6,10 +6,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Slf4j
+
 public class ProcessScheduler {
+
+  private static final Logger log = LoggerFactory.getLogger(ProcessScheduler.class);
 
 
   private final long administrativeYieldMillis;

@@ -5,11 +5,10 @@ import java.util.Map;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 /**
- * 
- * @author H510498
+ *
  *
  */
-public final class FlowFile implements Comparable<FlowFile>{
+public final class FlowFile implements Comparable<FlowFile> {
 
   private long id;
   private long entryDate;

@@ -56,9 +56,5 @@ public class ProcessContext {
     return procNode.getName();
   }
 
-  public boolean isRelationshipRetried(Relationship relationship) {
-    // TODO Auto-generated method stub
-    return false;
-  }
 
 }

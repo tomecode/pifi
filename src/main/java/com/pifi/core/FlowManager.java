@@ -88,5 +88,13 @@ public class FlowManager {
     }
   }
 
+  public FlowManager newFlow(String string) {
+    return this;
+  }
+
+  public Connectable add(Processor processor) {
+    return null;
+  }
+
 
 }
