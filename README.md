@@ -8,7 +8,7 @@ The primary idea for this project is to develop a single library that allows usi
 
 # Current status
 - basically, the core (thread) model or engine extracted from NIFI but without provenance
-- in project ```$pifi/src/pifi/main/com.pifi.demo.PocFlowDemo``` , there is a basic simple "demo" flow, where are three activities (processors), each of them connected via a relationship, *the idea behind this flow is to read files (polling directory) and process them asynchronously*
+- in the following class ```$pifi/src/test/java/com/pifi/demo/PocFlowDemo.java``` , is a basic simple "demo" flow, where are three activities (processors), each of them connected via a relationship, *the idea behind this flow is to read files (polling directory) and process them asynchronously*
 
 # TODO/what's next
 - extract provenance
