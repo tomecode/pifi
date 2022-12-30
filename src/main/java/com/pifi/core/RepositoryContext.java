@@ -23,8 +23,8 @@ public class RepositoryContext {
    * 
    * @return
    */
-  public Collection<Connection> getPutConnections() {
-    Collection<Connection> collection = connectable.getConnections(null);
+  public Collection<Connection> getPutConnections(Relationship rels) {
+    Collection<Connection> collection = connectable.getConnections(rels);
     if (collection == null) {
       collection = new ArrayList<>();
     }

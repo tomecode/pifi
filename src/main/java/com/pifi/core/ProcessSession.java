@@ -1,12 +1,11 @@
 package com.pifi.core;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,35 +42,38 @@ public class ProcessSession {
   }
 
   public FlowFile create() {
-    final Map<String, String> attrs = new HashMap<>();
-    final String uuid = UUID.randomUUID().toString();
-    attrs.put("UUID", uuid);
-    final FlowFile fFile = new FlowFile(uuid);
-
+    final FlowFile fFile = new FlowFile();
     final RepositoryRecord record = new RepositoryRecord(null);
-    record.setWorking(fFile, attrs, false);
+    record.setWorking(fFile, fFile.getAttributes(), false);
     records.put(fFile.getId(), record);
-
     return fFile;
   }
 
-  //
-  @SuppressWarnings("unlikely-arg-type")
   public void transfer(FlowFile flowFile) {
-    RepositoryRecord srr = getRecord(flowFile);
-
-    Collection<Connection> numDestinations = context.getPutConnections();
-    for (Connection numDestination : numDestinations) {
-
-      FlowFile recordFile = srr.getCurrent();
-      numDestination.enqueue(recordFile);
-    }
-    this.records.remove(srr);
-
+    transfer(flowFile, null);
   }
+
+  @SuppressWarnings("unlikely-arg-type")
+  public void transfer(FlowFile flowFile, Relationship rel) {
+    RepositoryRecord srr = getRecord(flowFile);
+    if (srr != null) {
+      Collection<Connection> numDestinations = context.getPutConnections(rel);
+      for (Connection numDestination : numDestinations) {
+
+        FlowFile recordFile = srr.getCurrent();
+        recordFile.getAttributes().put("identifier", numDestination.getIdentifier());
+        recordFile.getAttributes().put("relationships", Arrays.toString(numDestination.getRelationships().toArray()));
+        numDestination.enqueue(recordFile);
+      }
+      this.records.remove(srr);
+    }
+  }
+
 
   private RepositoryRecord getRecord(final FlowFile flowFile) {
     return records.get(flowFile.getId());
   }
+
+
 
 }

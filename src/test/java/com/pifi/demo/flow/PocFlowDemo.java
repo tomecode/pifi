@@ -1,4 +1,4 @@
-package com.pifi.demo;
+package com.pifi.demo.flow;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,13 +11,12 @@ import java.util.TimerTask;
 import com.pifi.core.Connectable;
 import com.pifi.core.FlowController;
 import com.pifi.core.FlowManager;
-import com.pifi.processors.ListFilesProcessor;
-import com.pifi.processors.PrintProcessor;
-import com.pifi.processors.ReadFileProcessor;
+import com.pifi.demo.processors.ListFilesProcessor;
+import com.pifi.demo.processors.PrintProcessor;
+import com.pifi.demo.processors.ReadFileProcessor;
 
 /**
- * simple demo where are 3 processors (3 activities), each of them connected via
- * relationship
+ * simple demo where are 3 processors (3 activities), each of them connected via relationship
  * 
  *
  */
@@ -30,6 +29,7 @@ public final class PocFlowDemo {
     FlowController flowController = new FlowController();
     FlowManager flowManager = flowController.getFlowManager();
 
+    // test directory
     Path testDir = Paths.get("target").toAbsolutePath();
     if (!Files.exists(testDir)) {
       Files.createDirectories(testDir);
@@ -46,10 +46,12 @@ public final class PocFlowDemo {
     //
     // simple flow, activity1->connected to->activity2 ->connected to->activity3
     //
-    flowManager.addConnection(activity1, activit2);
-    flowManager.addConnection(activit2, activit3);
+    flowManager.addConnection(activity1, activit2, ListFilesProcessor.REL_SUCCESS);
+    flowManager.addConnection(activit2, activit3, ListFilesProcessor.REL_SUCCESS);
 
-    // start processing
+    
+    
+    // start processors in flow
     flowManager.startProcessors();
 
 
@@ -70,7 +72,7 @@ public final class PocFlowDemo {
         }
 
       }
-    },  0, 60 * (1000 * 1));
+    }, 0, 60 * (1000 * 1));
 
 
   }

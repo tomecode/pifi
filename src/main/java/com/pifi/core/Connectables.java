@@ -3,7 +3,7 @@ package com.pifi.core;
 import java.util.Collection;
 import java.util.List;
 
-public class Connectables {
+public final class Connectables {
 
   public static boolean flowFilesQueued(final Connectable connectable) {
     for (final Connection conn : connectable.getIncomingConnections()) {

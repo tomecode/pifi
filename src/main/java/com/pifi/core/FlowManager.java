@@ -69,13 +69,19 @@ public class FlowManager {
   }
 
 
-  public final Connection addConnection(final Connectable source, final Connectable destination) {
+  /**
+   * create connection between two processors
+   * 
+   * @param source processor
+   * @param destination processor
+   * @param rel relationship name
+   * @return
+   */
+  public final Connection addConnection(final Connectable source, final Connectable destination, Relationship rel) {
     writeLock.lock();
     try {
-      List<Relationship> relationships = Collections
-          .singletonList(new Relationship.Builder().name("success").build());
-      Connection connection = new Connection(source, destination, // this.processScheduler,
-          relationships);
+      List<Relationship> relationships = Collections.singletonList(rel);
+      Connection connection = new Connection(source, destination, relationships);
 
       source.addConnection(connection);
       if (source != destination) { // don't call addConnection twice if it's a self-looping connection.

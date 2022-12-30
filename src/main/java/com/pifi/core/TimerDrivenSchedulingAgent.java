@@ -25,11 +25,11 @@ public class TimerDrivenSchedulingAgent {
 
   public void doSchedule(final Connectable connectable, final LifecycleState scheduleState) {
     final List<ScheduledFuture<?>> futures = new ArrayList<>();
-    if(log.isDebugEnabled()) {
-        log.debug("schedule: connectable " + connectable.getIdentifier());        
+    if (log.isDebugEnabled()) {
+      log.debug("schedule: connectable " + connectable.getIdentifier());
     }
-
-    final ConnectableTask connectableTask = new ConnectableTask(this, connectable, flowController, scheduleState);
+    
+    final ConnectableTask connectableTask = new ConnectableTask(this, connectable, scheduleState);
 
     for (int i = 0; i < connectable.getMaxConcurrentTasks(); i++) {
       // Determine the task to run and create it.
@@ -50,8 +50,8 @@ public class TimerDrivenSchedulingAgent {
     }
 
     scheduleState.setFutures(futures);
-    if(log.isTraceEnabled()) {
-        log.trace("Scheduled {} to run with {} threads", connectable, connectable.getMaxConcurrentTasks());        
+    if (log.isTraceEnabled()) {
+      log.trace("Scheduled {} to run with {} threads", connectable, connectable.getMaxConcurrentTasks());
     }
   }
 
@@ -66,7 +66,7 @@ public class TimerDrivenSchedulingAgent {
         // based on a lack of work for to do for the component.
         final InvocationResult invocationResult = connectableTask.invoke();
         if (invocationResult.isYield()) {
-          //log.debug("Yielding {} due to {}", connectable, invocationResult.getYieldExplanation());
+          // log.debug("Yielding {} due to {}", connectable, invocationResult.getYieldExplanation());
         }
 
         // If the component is yielded, cancel its future and re-submit it to run again
@@ -116,17 +116,17 @@ public class TimerDrivenSchedulingAgent {
           if (scheduledFuture.cancel(false)) {
             synchronized (scheduleState) {
               // if (scheduleState.isScheduled()) {
-                if (log.isTraceEnabled()) {
-                    log.trace("connetable={} is  SHEDULLED", connectable);
-                }
+              if (log.isTraceEnabled()) {
+                log.trace("connetable={} is  SHEDULLED", connectable);
+              }
               final ScheduledFuture<?> newFuture =
                   flowEngine.scheduleWithFixedDelay(this, noWorkYieldNanos, connectable.getSchedulingPeriod(TimeUnit.NANOSECONDS),
                       TimeUnit.NANOSECONDS);
 
               scheduleState.replaceFuture(scheduledFuture, newFuture);
               futureRef.set(newFuture);
-              if(log.isTraceEnabled()) {
-                  log.trace("connetable={} is not SHEDULLED", connectable);                  
+              if (log.isTraceEnabled()) {
+                log.trace("connetable={} is not SHEDULLED", connectable);
               }
             }
           }

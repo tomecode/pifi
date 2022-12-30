@@ -423,7 +423,7 @@ public class Connectable {
 
       // Now that the task has been scheduled, set the timeout
       long scheduledTimeout = System.currentTimeMillis() + processorStartTimeoutMillis;
-      log.info("scheduled timeout={}", scheduledTimeout);
+      log.debug("scheduled timeout={}", scheduledTimeout);
       completionTimestampRef.set(scheduledTimeout);
 
       try {

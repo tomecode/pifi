@@ -1,4 +1,4 @@
-package com.pifi.processors;
+package com.pifi.demo.processors;
 
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -15,6 +15,7 @@ import com.pifi.core.FlowFile;
 import com.pifi.core.ProcessContext;
 import com.pifi.core.ProcessSession;
 import com.pifi.core.Processor;
+import com.pifi.core.Relationship;
 
 /**
  * sample processor that read files form FS and send them to the next queue
@@ -26,8 +27,13 @@ public class ListFilesProcessor extends Processor {
 
 
   private final Path rootDir;
-
   private final String fileSufix;
+
+
+  public static final Relationship REL_SUCCESS = new Relationship.Builder().name("success").build();
+  public static final Relationship REL_ERROR = new Relationship.Builder().name("error").build();
+
+
 
   public ListFilesProcessor(String name, Path rootDir, String fileSufix) {
     super(name);
@@ -47,14 +53,13 @@ public class ListFilesProcessor extends Processor {
         result.addAll(r);
       }
     }
-
-
-    log.info("processor={} rootDir={} listFiles={}", getIdentifier(), rootDir, result.size());
+    
+    if (log.isDebugEnabled()) {
+      log.debug("processor={} rootDir={} listFiles={}", getIdentifier(), rootDir, result.size());
+    }
 
     for (Path file : result) {
       Path newPath = Files.move(file, Paths.get(file.getParent().toString(), file.getFileName().toString() + "_1"), StandardCopyOption.ATOMIC_MOVE);
-
-
 
       // create flow flow as in nifi and transfer it to the next processor
       FlowFile ff = session.create();
@@ -64,7 +69,9 @@ public class ListFilesProcessor extends Processor {
 
       log.info("processor={} transfer (send) flowFile.Id={}", getIdentifier(), ff.getId());
 
-      session.transfer(ff);
+
+      // sends a message to the next activity, via relationship 'success'
+      session.transfer(ff, REL_SUCCESS);
     }
   }
 

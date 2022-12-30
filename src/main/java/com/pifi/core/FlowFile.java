@@ -2,6 +2,7 @@ package com.pifi.core;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 /**
@@ -11,67 +12,27 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
 public final class FlowFile implements Comparable<FlowFile> {
 
   private long id;
-  private long entryDate;
-  private long lineageStartDate;
-  private long lineageStartIndex;
-  private long size;
-  private long penaltyExpirationMs;
   private Map<String, String> attributes;
-  private long claimOffset;
-  private long lastQueueDate;
-  private long queueDateIndex;
 
-
-  public FlowFile(String uuid) {
-    this.entryDate = System.currentTimeMillis();
+  public FlowFile() {
+    final UUID uuid = UUID.randomUUID();
+    this.id = uuid.getMostSignificantBits() & Long.MAX_VALUE;
     this.attributes = new HashMap<String, String>();
+    this.attributes.put("entryDate", String.valueOf(System.currentTimeMillis()));
+    this.attributes.put("UUID", uuid.toString());
   }
 
   public long getId() {
     return id;
   }
 
-  public long getEntryDate() {
-    return entryDate;
-  }
-
-  public long getLineageStartDate() {
-    return lineageStartDate;
-  }
-
-  public Long getLastQueueDate() {
-    return lastQueueDate;
-  }
-
-  public boolean isPenalized() {
-    return penaltyExpirationMs > 0 ? penaltyExpirationMs > System.currentTimeMillis() : false;
-  }
-
   public String getAttribute(final String key) {
     return attributes.get(key);
-  }
-
-  public long getSize() {
-    return size;
   }
 
   public Map<String, String> getAttributes() {
     return this.attributes;
   }
-
-  public long getContentClaimOffset() {
-    return this.claimOffset;
-  }
-
-
-  public long getLineageStartIndex() {
-    return lineageStartIndex;
-  }
-
-  public long getQueueDateIndex() {
-    return queueDateIndex;
-  }
-
 
   @Override
   public boolean equals(final Object other) {

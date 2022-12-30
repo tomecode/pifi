@@ -11,20 +11,16 @@ public final class ConnectableTask {
   private final TimerDrivenSchedulingAgent schedulingAgent;
   private final Connectable connectable;
   private final ProcessContext processContext;
-  private final FlowController flowController;
+
   private final AtomicLong invocations = new AtomicLong(0L);
   private final LifecycleState scheduleState;
 
   private final RepositoryContext repositoryContext;
 
-  public ConnectableTask(final TimerDrivenSchedulingAgent schedulingAgent, final Connectable connectable,
-      final FlowController flowController, final LifecycleState scheduleState) {
-
+  public ConnectableTask(final TimerDrivenSchedulingAgent schedulingAgent, final Connectable connectable, final LifecycleState scheduleState) {
     this.schedulingAgent = schedulingAgent;
     this.connectable = connectable;
     this.scheduleState = scheduleState;
-    this.flowController = flowController;
-
     repositoryContext = new RepositoryContext(connectable, invocations);
     processContext = new ProcessContext((Connectable) connectable);
   }
@@ -61,15 +57,15 @@ public final class ConnectableTask {
 
     // Make sure processor has work to do.
     if (!isWorkToDo()) {
-      if(log.isTraceEnabled()) {
-          log.trace("Yielding {} because it has no work to do", connectable);          
+      if (log.isTraceEnabled()) {
+        log.trace("Yielding {} because it has no work to do", connectable);
       }
       return InvocationResult.yield("No work to do");
     }
 
 
-    
-    //log.debug("Triggering {}", connectable);
+
+    // log.debug("Triggering {}", connectable);
     // final long totalInvocationCount = invocations.getAndIncrement();
     // final ProcessSession rawSession;
 

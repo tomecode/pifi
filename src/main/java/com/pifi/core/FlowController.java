@@ -16,21 +16,18 @@ public class FlowController {
   private final ProcessScheduler processScheduler;
 
   public FlowController() {
-
     this.flowManager = new FlowManager(this);
     maxTimerDrivenThreads = new AtomicInteger(2);
-    timerDrivenEngineRef = new AtomicReference<>(
-        new FlowEngine(maxTimerDrivenThreads.get(), "Timer-Driven Process"));
+    timerDrivenEngineRef = new AtomicReference<>(new FlowEngine(maxTimerDrivenThreads.get(), "Timer-Driven Process"));
 
-    final TimerDrivenSchedulingAgent timerDrivenAgent = new TimerDrivenSchedulingAgent(this,
-        timerDrivenEngineRef.get());
+    final TimerDrivenSchedulingAgent timerDrivenAgent = new TimerDrivenSchedulingAgent(this, timerDrivenEngineRef.get());
 
     logger.info("Init flow controller, with Timer-Driven threads=" + maxTimerDrivenThreads);
-    processScheduler = new ProcessScheduler(timerDrivenEngineRef.get(), this, timerDrivenAgent);
+    processScheduler = new ProcessScheduler(timerDrivenEngineRef.get(), timerDrivenAgent);
     flowManager.setProcessScheduler(processScheduler);
   }
 
-  public ProcessScheduler getProcessScheduler() {
+  protected ProcessScheduler getProcessScheduler() {
     return this.processScheduler;
   }
 

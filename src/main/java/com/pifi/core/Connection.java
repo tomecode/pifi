@@ -26,15 +26,15 @@ public class Connection {
     this.relationships = new AtomicReference<>(Collections.unmodifiableCollection(relationships));
   }
 
-  public FlowFileQueue getFlowFileQueue() {
+  protected FlowFileQueue getFlowFileQueue() {
     return this.flowFileQueue;
   }
 
-  public Connectable getSource() {
+  protected Connectable getSource() {
     return this.source;
   }
 
-  public Connectable getDestination() {
+  protected Connectable getDestination() {
     return destination.get();
   }
 
@@ -43,7 +43,7 @@ public class Connection {
   }
 
 
-  public FlowFile poll(final Set<FlowFile> expiredRecords) {
+  protected FlowFile poll(final Set<FlowFile> expiredRecords) {
     return flowFileQueue.poll(expiredRecords);
   }
 
@@ -54,12 +54,11 @@ public class Connection {
    *
    * @param flowFile to add
    */
-
-  public void enqueue(final FlowFile flowFile) {
+  protected final void enqueue(final FlowFile flowFile) {
     flowFileQueue.put(flowFile);
   }
 
-  public void setDestination(final Connectable newDestination) {
+  protected void setDestination(final Connectable newDestination) {
     final Connectable previousDestination = destination.get();
     if (previousDestination.equals(newDestination)) {
       return;
@@ -77,7 +76,7 @@ public class Connection {
     }
   }
 
-  public Collection<Relationship> getRelationships() {
+  protected Collection<Relationship> getRelationships() {
     return relationships.get();
   }
 

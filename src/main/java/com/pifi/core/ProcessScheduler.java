@@ -16,7 +16,6 @@ public class ProcessScheduler {
 
 
   private final long administrativeYieldMillis;
-  private final FlowController flowController;
   private final long processorStartTimeoutMillis;
 
   private final ScheduledExecutorService frameworkTaskExecutor;
@@ -29,9 +28,7 @@ public class ProcessScheduler {
   private final ScheduledExecutorService componentLifeCycleThreadPool;
   private final ScheduledExecutorService componentMonitoringThreadPool = new FlowEngine(2, "Monitor Processor Lifecycle", true);
 
-  public ProcessScheduler(FlowEngine componentLifecycleThreadPool, FlowController flowController,
-      TimerDrivenSchedulingAgent timerDrivenSchedulingAgent) {
-    this.flowController = flowController;
+  public ProcessScheduler(FlowEngine componentLifecycleThreadPool, TimerDrivenSchedulingAgent timerDrivenSchedulingAgent) {
     this.componentLifeCycleThreadPool = componentLifecycleThreadPool;
     this.schedulingAgent = timerDrivenSchedulingAgent;
 
