@@ -29,9 +29,9 @@ import com.pifi.core.ProcessScheduler.SchedulingAgentCallback;
  */
 public class Connectable {
 
-  public static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.MILLISECONDS;
-  public static final String DEFAULT_YIELD_PERIOD = "1 sec";
-  public static final String DEFAULT_PENALIZATION_PERIOD = "30 sec";
+  // public static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.MILLISECONDS;
+  // public static final String DEFAULT_YIELD_PERIOD = "1 sec";
+  // public static final String DEFAULT_PENALIZATION_PERIOD = "30 sec";
 
   private final AtomicInteger concurrentTaskCount;
 
@@ -50,7 +50,7 @@ public class Connectable {
   private final Map<Thread, ActiveTask> activeThreads = new ConcurrentHashMap<>(48);
   private final AtomicReference<Processor> processorRef;
 
-  public static final long MINIMUM_SCHEDULING_NANOS = 1000L;
+  private static final long MINIMUM_SCHEDULING_NANOS = 1000L;
 
   protected final AtomicReference<ScheduledState> scheduledState;
 
@@ -361,9 +361,8 @@ public class Connectable {
   /**
    * Will idempotently start the processor
    */
-  public void
-      start(final ScheduledExecutorService taskScheduler, final long administrativeYieldMillis, final long processorStartTimeoutMillis,
-          final SchedulingAgentCallback schedulingAgentCallback) {
+  public void start(final ScheduledExecutorService taskScheduler, final long administrativeYieldMillis, final long processorStartTimeoutMillis,
+      final SchedulingAgentCallback schedulingAgentCallback) {
 
     ScheduledState desiredState = ScheduledState.RUNNING;
     ScheduledState scheduledState = ScheduledState.STARTING;
@@ -557,7 +556,7 @@ public class Connectable {
   }
 
 
-  public static final class ActiveTask {
+  protected static final class ActiveTask {
     private final long startTime;
     private volatile boolean terminated;
 

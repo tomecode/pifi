@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimerDrivenSchedulingAgent {
+final class TimerDrivenSchedulingAgent {
   private final long noWorkYieldNanos;
 
   protected final Logger log = LoggerFactory.getLogger(this.getClass());

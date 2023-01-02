@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.LoggerFactory;
 
-public class FlowEngine extends ScheduledThreadPoolExecutor {
+final class FlowEngine extends ScheduledThreadPoolExecutor {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(FlowEngine.class);
 

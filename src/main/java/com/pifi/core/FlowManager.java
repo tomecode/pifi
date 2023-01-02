@@ -41,34 +41,6 @@ public class FlowManager {
     }
   }
 
-  public final void setProcessScheduler(ProcessScheduler processScheduler) {
-    this.processScheduler = processScheduler;
-  }
-
-  public final void startProcessors() {
-    try {
-      readLock.lock();
-      for (Entry<String, Connectable> p : this.allProcessors.entrySet()) {
-        processScheduler.startProcessor(p.getValue());
-      }
-    } finally {
-      readLock.unlock();
-    }
-  }
-
-
-  public void stopProcessors() {
-    readLock.lock();
-    try {
-      for (Entry<String, Connectable> p : this.allProcessors.entrySet()) {
-        processScheduler.stopProcessor(p.getValue());
-      }
-    } finally {
-      readLock.unlock();
-    }
-  }
-
-
   /**
    * create connection between two processors
    * 
@@ -94,13 +66,26 @@ public class FlowManager {
     }
   }
 
-  public FlowManager newFlow(String string) {
-    return this;
+  public final void startProcessors() {
+    try {
+      readLock.lock();
+      for (Entry<String, Connectable> p : this.allProcessors.entrySet()) {
+        processScheduler.startProcessor(p.getValue());
+      }
+    } finally {
+      readLock.unlock();
+    }
   }
 
-  public Connectable add(Processor processor) {
-    return null;
+  public void stopProcessors() {
+    readLock.lock();
+    try {
+      for (Entry<String, Connectable> p : this.allProcessors.entrySet()) {
+        processScheduler.stopProcessor(p.getValue());
+      }
+    } finally {
+      readLock.unlock();
+    }
   }
-
 
 }

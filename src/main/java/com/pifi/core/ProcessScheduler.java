@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ProcessScheduler {
+final class ProcessScheduler {
 
   private static final Logger log = LoggerFactory.getLogger(ProcessScheduler.class);
 

@@ -17,7 +17,7 @@ public class Connection {
   public Connection(Connectable source, Connectable destination, List<Relationship> relationships) {
     this.source = source;
     this.destination = new AtomicReference<>(destination);
-    flowFileQueue = new FlowFileQueue();
+    this.flowFileQueue = new FlowFileQueue();
     if (relationships.isEmpty()) {
       relationships.add(Relationship.ANONYMOUS);
     }

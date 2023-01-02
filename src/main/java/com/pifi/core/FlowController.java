@@ -24,7 +24,6 @@ public class FlowController {
 
     logger.info("Init flow controller, with Timer-Driven threads=" + maxTimerDrivenThreads);
     processScheduler = new ProcessScheduler(timerDrivenEngineRef.get(), timerDrivenAgent);
-    flowManager.setProcessScheduler(processScheduler);
   }
 
   protected ProcessScheduler getProcessScheduler() {

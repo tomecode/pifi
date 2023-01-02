@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FlowFileQueue {
+final class FlowFileQueue {
 
   private static final Logger log = LoggerFactory.getLogger(FlowFileQueue.class);
 
@@ -71,10 +71,6 @@ public class FlowFileQueue {
     } finally {
       writeLock.unlock("put(FlowFileRecord)");
     }
-  }
-
-  public boolean areThereFlowFiles() {
-    return activeQueue.size() == 0;
   }
 
 

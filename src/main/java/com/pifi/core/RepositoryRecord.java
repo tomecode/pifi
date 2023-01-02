@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RepositoryRecord {
+final class RepositoryRecord {
 
   private FlowFile workingFlowFileRecord = null;
   private Relationship transferRelationship = null;

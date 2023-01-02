@@ -5,24 +5,24 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class ConnectableTask {
+final class ConnectableTask {
   private static final Logger log = LoggerFactory.getLogger(ConnectableTask.class);
 
-  private final TimerDrivenSchedulingAgent schedulingAgent;
+  // private final TimerDrivenSchedulingAgent schedulingAgent;
   private final Connectable connectable;
-  private final ProcessContext processContext;
+  // private final ProcessContext processContext;
 
   private final AtomicLong invocations = new AtomicLong(0L);
   private final LifecycleState scheduleState;
 
   private final RepositoryContext repositoryContext;
 
-  public ConnectableTask(final TimerDrivenSchedulingAgent schedulingAgent, final Connectable connectable, final LifecycleState scheduleState) {
-    this.schedulingAgent = schedulingAgent;
+  protected ConnectableTask(final TimerDrivenSchedulingAgent schedulingAgent, final Connectable connectable, final LifecycleState scheduleState) {
+    // this.schedulingAgent = schedulingAgent;
     this.connectable = connectable;
     this.scheduleState = scheduleState;
     repositoryContext = new RepositoryContext(connectable, invocations);
-    processContext = new ProcessContext((Connectable) connectable);
+    // processContext = new ProcessContext((Connectable) connectable);
   }
 
   public Connectable getConnectable() {

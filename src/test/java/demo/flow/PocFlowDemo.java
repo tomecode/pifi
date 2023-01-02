@@ -1,4 +1,4 @@
-package com.pifi.demo.flow;
+package demo.flow;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,9 +11,9 @@ import java.util.TimerTask;
 import com.pifi.core.Connectable;
 import com.pifi.core.FlowController;
 import com.pifi.core.FlowManager;
-import com.pifi.demo.processors.ListFilesProcessor;
-import com.pifi.demo.processors.PrintProcessor;
-import com.pifi.demo.processors.ReadFileProcessor;
+import demo.processors.ListFilesProcessor;
+import demo.processors.PrintProcessor;
+import demo.processors.ReadFileProcessor;
 
 /**
  * simple demo where are 3 processors (3 activities), each of them connected via relationship

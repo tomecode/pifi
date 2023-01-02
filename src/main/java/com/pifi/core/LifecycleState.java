@@ -10,7 +10,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class LifecycleState {
+final class LifecycleState {
 
   private final AtomicInteger activeThreadCount = new AtomicInteger(0);
   private final AtomicBoolean scheduled = new AtomicBoolean(false);

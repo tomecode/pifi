@@ -6,7 +6,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class RepositoryContext {
+class RepositoryContext {
+
   private final AtomicLong connectionIndex;
   private final Connectable connectable;
 
