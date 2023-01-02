@@ -5,7 +5,6 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.pifi.core.FlowFile;
-import com.pifi.core.ProcessContext;
 import com.pifi.core.ProcessSession;
 import com.pifi.core.Processor;
 import com.pifi.core.Relationship;
@@ -23,7 +22,7 @@ public class ReadFileProcessor extends Processor {
   }
 
   @Override
-  public void onTrigger(ProcessContext context, ProcessSession session) throws Exception {
+  public void onTrigger(ProcessSession session) throws Exception {
     FlowFile ff = session.get();
     if (ff != null) {
       log.info("processor={} received flowFile.Id={}", getIdentifier(), ff.getId());
@@ -36,7 +35,7 @@ public class ReadFileProcessor extends Processor {
       newff.getAttributes().putAll(ff.getAttributes());
       newff.getAttributes().put("content", content);
 
-      //sends a message to the next activity, via relationship 'success'
+      // sends a message to the next activity, via relationship 'success'
       session.transfer(newff, REL_SUCCESS);
     }
   }

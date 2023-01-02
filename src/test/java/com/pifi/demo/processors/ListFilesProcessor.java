@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.pifi.core.FlowFile;
-import com.pifi.core.ProcessContext;
 import com.pifi.core.ProcessSession;
 import com.pifi.core.Processor;
 import com.pifi.core.Relationship;
@@ -42,7 +41,7 @@ public class ListFilesProcessor extends Processor {
   }
 
   @Override
-  public void onTrigger(ProcessContext context, ProcessSession session) throws Exception {
+  public void onTrigger(ProcessSession session) throws Exception {
     List<Path> result = new ArrayList<>();
     if (Files.isDirectory(rootDir, LinkOption.NOFOLLOW_LINKS)) {
       try (Stream<Path> paths = Files.walk(rootDir)) {
@@ -53,7 +52,7 @@ public class ListFilesProcessor extends Processor {
         result.addAll(r);
       }
     }
-    
+
     if (log.isDebugEnabled()) {
       log.debug("processor={} rootDir={} listFiles={}", getIdentifier(), rootDir, result.size());
     }
