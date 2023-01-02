@@ -65,12 +65,6 @@ public final class ConnectableTask {
 
 
 
-    // log.debug("Triggering {}", connectable);
-    // final long totalInvocationCount = invocations.getAndIncrement();
-    // final ProcessSession rawSession;
-
-
-
     final ProcessSession session = new ProcessSession(repositoryContext);
     // WeakHashMapProcessSessionFactory(sessionFactory);
     scheduleState.incrementActiveThreadCount(session);
@@ -87,7 +81,7 @@ public final class ConnectableTask {
       // || connectable.getScheduledState() == ScheduledState.RUN_ONCE;
       while (shouldRun) {
         invocationCount++;
-        connectable.onTrigger(processContext, session);
+        connectable.onTrigger(session);
 
         final long nanoTime = System.nanoTime();
         if (nanoTime > finishNanos) {

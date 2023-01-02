@@ -66,7 +66,6 @@ public final class Relationship implements Comparable<Relationship> {
       return this;
     }
 
-
     public Builder autoTerminateDefault(boolean autoTerminate) {
       this.autoTerminate = autoTerminate;
       return this;

@@ -49,12 +49,12 @@ public class ProcessSession {
     return fFile;
   }
 
-  public void transfer(FlowFile flowFile) {
+  public final void transfer(FlowFile flowFile) {
     transfer(flowFile, null);
   }
 
   @SuppressWarnings("unlikely-arg-type")
-  public void transfer(FlowFile flowFile, Relationship rel) {
+  public final void transfer(FlowFile flowFile, Relationship rel) {
     RepositoryRecord srr = getRecord(flowFile);
     if (srr != null) {
       Collection<Connection> numDestinations = context.getPutConnections(rel);

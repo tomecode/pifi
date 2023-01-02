@@ -5,26 +5,28 @@ import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-/**
- *
- *
- */
+
 public final class FlowFile implements Comparable<FlowFile> {
 
-  private long id;
+  private final long id;
+  private final long entryDate;
   private Map<String, String> attributes;
 
   public FlowFile() {
     final UUID uuid = UUID.randomUUID();
     this.id = uuid.getMostSignificantBits() & Long.MAX_VALUE;
+    this.entryDate = System.currentTimeMillis();
     this.attributes = new HashMap<String, String>();
-    this.attributes.put("entryDate", String.valueOf(System.currentTimeMillis()));
-    this.attributes.put("UUID", uuid.toString());
+  }
+
+  public long getEntryDate() {
+    return entryDate;
   }
 
   public long getId() {
     return id;
   }
+
 
   public String getAttribute(final String key) {
     return attributes.get(key);

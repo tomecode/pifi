@@ -11,15 +11,13 @@ public class Connection {
   private Connectable source;
   private final AtomicReference<Connectable> destination;
   private volatile FlowFileQueue flowFileQueue;
-  // private ProcessScheduler scheduler;
+
   private final AtomicReference<Collection<Relationship>> relationships;
 
-  public Connection(Connectable source, Connectable destination, // ProcessScheduler scheduler,
-      List<Relationship> relationships) {
+  public Connection(Connectable source, Connectable destination, List<Relationship> relationships) {
     this.source = source;
     this.destination = new AtomicReference<>(destination);
     flowFileQueue = new FlowFileQueue();
-    // this.scheduler = scheduler;
     if (relationships.isEmpty()) {
       relationships.add(Relationship.ANONYMOUS);
     }

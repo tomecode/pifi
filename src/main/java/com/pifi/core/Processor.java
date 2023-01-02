@@ -33,11 +33,10 @@ public abstract class Processor {
 
   /**
    * 
-   * @param context
    * @param session
    * @throws Exception
    */
-  public abstract void onTrigger(ProcessContext context, ProcessSession session) throws Exception;
+  public abstract void onTrigger(ProcessSession session) throws Exception;
 
 
 

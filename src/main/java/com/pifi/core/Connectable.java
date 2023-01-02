@@ -19,11 +19,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.pifi.core.ProcessScheduler.SchedulingAgentCallback;
 
 /**
- * Provides thread-safe access to a PRocessor as it exists within a controlled
- * flow. This node keeps track of the processor, its scheduling information and its relationships to
- * other processors and whatever scheduled futures exist for it. Must be thread safe.
+ * Provides thread-safe access to a PRocessor as it exists within a controlled flow. This node keeps
+ * track of the processor, its scheduling information and its relationships to other processors and
+ * whatever scheduled futures exist for it. Must be thread safe.
  *
  */
 public class Connectable {
@@ -323,11 +324,11 @@ public class Connectable {
     return markedAutoTerminate && getConnections(relationship).isEmpty();
   }
 
-  public void onTrigger(ProcessContext context, ProcessSession session) throws Exception {
+  protected final void onTrigger(ProcessSession session) throws Exception {
     final Processor processor = processorRef.get();
     activateThread();
     try {
-      processor.onTrigger(context, session);
+      processor.onTrigger(session);
     } finally {
       deactivateThread();
     }
@@ -360,8 +361,9 @@ public class Connectable {
   /**
    * Will idempotently start the processor
    */
-  public void start(final ScheduledExecutorService taskScheduler, final long administrativeYieldMillis, final long processorStartTimeoutMillis,
-      final SchedulingAgentCallback schedulingAgentCallback) {
+  public void
+      start(final ScheduledExecutorService taskScheduler, final long administrativeYieldMillis, final long processorStartTimeoutMillis,
+          final SchedulingAgentCallback schedulingAgentCallback) {
 
     ScheduledState desiredState = ScheduledState.RUNNING;
     ScheduledState scheduledState = ScheduledState.STARTING;

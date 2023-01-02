@@ -121,4 +121,13 @@ public class ProcessScheduler {
     return null;
   }
 
+
+  public interface SchedulingAgentCallback {
+    void onTaskComplete();
+
+    Future<?> scheduleTask(Callable<?> task);
+
+    void trigger();
+  }
+
 }
