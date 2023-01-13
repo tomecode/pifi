@@ -53,7 +53,6 @@ public class ProcessSession {
     transfer(flowFile, null);
   }
 
-  @SuppressWarnings("unlikely-arg-type")
   public final void transfer(FlowFile flowFile, Relationship rel) {
     RepositoryRecord srr = getRecord(flowFile);
     if (srr != null) {
@@ -65,15 +64,15 @@ public class ProcessSession {
         recordFile.getAttributes().put("relationships", Arrays.toString(numDestination.getRelationships().toArray()));
         numDestination.enqueue(recordFile);
       }
-      this.records.remove(srr);
+      removeRecord(flowFile);
     }
   }
 
-
-  private RepositoryRecord getRecord(final FlowFile flowFile) {
-    return records.get(flowFile.getId());
+  private final void removeRecord(final FlowFile flowFile) {
+    records.remove(flowFile.getId());
   }
 
-
-
+  private final RepositoryRecord getRecord(final FlowFile flowFile) {
+    return records.get(flowFile.getId());
+  }
 }
