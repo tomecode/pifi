@@ -5,10 +5,15 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FlowManager {
+
+  private static final Logger logger = LoggerFactory.getLogger(FlowManager.class);
 
   private final ReentrantReadWriteLock rwLock = new ReentrantReadWriteLock();
   private final Lock readLock = rwLock.readLock();
@@ -17,13 +22,19 @@ public class FlowManager {
   private final ConcurrentMap<String, Connection> allConnections = new ConcurrentHashMap<>();
   private final ConcurrentMap<String, Connectable> allProcessors = new ConcurrentHashMap<>();
 
-  private final FlowController flowController;
 
-  private ProcessScheduler processScheduler;
+  private final AtomicInteger maxTimerDrivenThreads;
+  private final FlowEngine timerDrivenFlowEngine;
 
-  public FlowManager(FlowController flowController) {
-    this.flowController = flowController;
-    this.processScheduler = this.flowController.getProcessScheduler();
+  private final ProcessScheduler processScheduler;
+
+  public FlowManager() {
+    maxTimerDrivenThreads = new AtomicInteger(2);
+    timerDrivenFlowEngine = new FlowEngine(maxTimerDrivenThreads.get(), "Timer-Driven Process");
+    final TimerDrivenSchedulingAgent timerDrivenAgent = new TimerDrivenSchedulingAgent(timerDrivenFlowEngine);
+    processScheduler = new ProcessScheduler(timerDrivenFlowEngine, timerDrivenAgent);
+
+    logger.info("Init flow mananger, with Timer-Driven threads={}", maxTimerDrivenThreads);
   }
 
   public final Connectable addProcessor(Processor processor) {
@@ -33,7 +44,7 @@ public class FlowManager {
       if (allProcessors.keySet().stream().filter(e -> e.equalsIgnoreCase(processor.getIdentifier())).count() > 0) {
         throw new RuntimeException("Processor with id=" + processor.getIdentifier() + " already exists");
       }
-      final Connectable procNode = new Connectable(processor, flowController.getProcessScheduler());
+      final Connectable procNode = new Connectable(processor, processScheduler);
       allProcessors.put(processor.getIdentifier(), procNode);
       return procNode;
     } finally {

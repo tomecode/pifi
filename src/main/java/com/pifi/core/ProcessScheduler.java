@@ -14,7 +14,6 @@ final class ProcessScheduler {
 
   private static final Logger log = LoggerFactory.getLogger(ProcessScheduler.class);
 
-
   private final long administrativeYieldMillis;
   private final long processorStartTimeoutMillis;
 

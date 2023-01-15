@@ -8,21 +8,17 @@ import org.slf4j.LoggerFactory;
 final class ConnectableTask {
   private static final Logger log = LoggerFactory.getLogger(ConnectableTask.class);
 
-  // private final TimerDrivenSchedulingAgent schedulingAgent;
   private final Connectable connectable;
-  // private final ProcessContext processContext;
 
   private final AtomicLong invocations = new AtomicLong(0L);
   private final LifecycleState scheduleState;
 
   private final RepositoryContext repositoryContext;
 
-  protected ConnectableTask(final TimerDrivenSchedulingAgent schedulingAgent, final Connectable connectable, final LifecycleState scheduleState) {
-    // this.schedulingAgent = schedulingAgent;
+  protected ConnectableTask(final Connectable connectable, final LifecycleState scheduleState) {
     this.connectable = connectable;
     this.scheduleState = scheduleState;
-    repositoryContext = new RepositoryContext(connectable, invocations);
-    // processContext = new ProcessContext((Connectable) connectable);
+    this.repositoryContext = new RepositoryContext(connectable, invocations);
   }
 
   public Connectable getConnectable() {

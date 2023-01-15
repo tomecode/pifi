@@ -13,22 +13,20 @@ final class TimerDrivenSchedulingAgent {
 
   protected final Logger log = LoggerFactory.getLogger(this.getClass());
 
-  protected final FlowController flowController;
   private final FlowEngine flowEngine;
 
-  public TimerDrivenSchedulingAgent(FlowController flowController, final FlowEngine flowEngine) {
+  public TimerDrivenSchedulingAgent(final FlowEngine flowEngine) {
     this.flowEngine = flowEngine;
-    this.flowController = flowController;
     this.noWorkYieldNanos = 20000l; // millis
   }
 
-  public void doSchedule(final Connectable connectable, final LifecycleState scheduleState) {
+  final void doSchedule(final Connectable connectable, final LifecycleState scheduleState) {
     final List<ScheduledFuture<?>> futures = new ArrayList<>();
     if (log.isDebugEnabled()) {
       log.debug("schedule: connectable " + connectable.getIdentifier());
     }
 
-    final ConnectableTask connectableTask = new ConnectableTask(this, connectable, scheduleState);
+    final ConnectableTask connectableTask = new ConnectableTask(connectable, scheduleState);
 
     for (int i = 0; i < connectable.getMaxConcurrentTasks(); i++) {
       // Determine the task to run and create it.

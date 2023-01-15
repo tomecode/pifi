@@ -9,7 +9,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Timer;
 import java.util.TimerTask;
 import com.pifi.core.Connectable;
-import com.pifi.core.FlowController;
 import com.pifi.core.FlowManager;
 import demo.processors.ListFilesProcessor;
 import demo.processors.PrintProcessor;
@@ -26,8 +25,7 @@ public final class PocFlowDemo {
   public static void main(String[] args) throws Exception {
 
     // engine
-    FlowController flowController = new FlowController();
-    FlowManager flowManager = flowController.getFlowManager();
+    FlowManager flowManager = new FlowManager();
 
     // test directory
     Path testDir = Paths.get("target").toAbsolutePath();
@@ -49,8 +47,8 @@ public final class PocFlowDemo {
     flowManager.addConnection(activity1, activit2, ListFilesProcessor.REL_SUCCESS);
     flowManager.addConnection(activit2, activit3, ListFilesProcessor.REL_SUCCESS);
 
-    
-    
+
+
     // start processors in flow
     flowManager.startProcessors();
 
@@ -59,8 +57,6 @@ public final class PocFlowDemo {
     Timer timer = new Timer();
     timer.schedule(new TimerTask() {
       public void run() {
-
-
         try {
           String baseName = "test_" + System.currentTimeMillis() + ".txt";
           Path testFile = testDir.resolve(baseName + "_c");
