@@ -9,6 +9,9 @@
         <Logger name="com.pifi" level="info" additivity="false">
             <AppenderRef ref="LogToConsole"/>
         </Logger>
+        <Logger name="demo.processors" level="info" additivity="false">
+            <AppenderRef ref="LogToConsole"/>
+        </Logger>        
         <Root level="error">
             <AppenderRef ref="LogToConsole"/>
         </Root>
