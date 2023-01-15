@@ -3,6 +3,7 @@ package com.pifi.core;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import com.pifi.core.api.FlowFile;
 
 final class RepositoryRecord {
 

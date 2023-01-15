@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.pifi.core.api.FlowFile;
 
 public class ProcessSession {
   private static final Logger log = LoggerFactory.getLogger(ProcessSession.class);

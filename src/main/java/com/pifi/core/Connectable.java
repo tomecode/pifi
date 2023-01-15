@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.pifi.core.ProcessScheduler.SchedulingAgentCallback;
+import com.pifi.core.api.Processor;
 
 /**
  * Provides thread-safe access to a PRocessor as it exists within a controlled flow. This node keeps

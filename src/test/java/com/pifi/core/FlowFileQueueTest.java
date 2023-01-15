@@ -2,6 +2,7 @@ package com.pifi.core;
 
 import org.junit.Assert;
 import org.junit.Test;
+import com.pifi.core.api.FlowFile;
 
 
 public final class FlowFileQueueTest {

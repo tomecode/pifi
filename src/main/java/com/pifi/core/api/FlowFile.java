@@ -1,11 +1,15 @@
-package com.pifi.core;
+package com.pifi.core.api;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
-
+/**
+ * The flowfile is an envelope between processors, the flowfile contains the data that was or will
+ * be processed.
+ *
+ */
 public final class FlowFile implements Comparable<FlowFile> {
 
   private final long id;

@@ -2,9 +2,9 @@ package demo.processors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.pifi.core.FlowFile;
 import com.pifi.core.ProcessSession;
-import com.pifi.core.Processor;
+import com.pifi.core.api.FlowFile;
+import com.pifi.core.api.Processor;
 
 public class PrintProcessor extends Processor {
 

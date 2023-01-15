@@ -2,6 +2,7 @@ package com.pifi.core;
 
 import java.util.Collections;
 import org.junit.Assert;
+import com.pifi.core.api.Processor;
 
 public final class ProcessorTest {
 
