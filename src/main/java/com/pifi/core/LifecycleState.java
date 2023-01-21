@@ -70,18 +70,18 @@ final class LifecycleState {
     return scheduled.get();
   }
 
-  public synchronized void setScheduled(final boolean scheduled) {
-    this.scheduled.set(scheduled);
-    mustCallOnStoppedMethods.set(true);
+//  public synchronized void setScheduled(final boolean scheduled) {
+//    this.scheduled.set(scheduled);
+//    mustCallOnStoppedMethods.set(true);
+//
+//    if (!scheduled) {
+//      lastStopTime = System.currentTimeMillis();
+//    }
+//  }
 
-    if (!scheduled) {
-      lastStopTime = System.currentTimeMillis();
-    }
-  }
-
-  public long getLastStopTime() {
-    return lastStopTime;
-  }
+//  public long getLastStopTime() {
+//    return lastStopTime;
+//  }
 
   @Override
   public String toString() {

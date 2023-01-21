@@ -59,8 +59,6 @@ final class FlowEngine extends ScheduledThreadPoolExecutor {
    */
   @Override
   protected void beforeExecute(final Thread thread, final Runnable runnable) {
-    // Ensure classloader is correct
-    // thread.setContextClassLoader(NarThreadContextClassLoader.getInstance());
     super.beforeExecute(thread, runnable);
   }
 

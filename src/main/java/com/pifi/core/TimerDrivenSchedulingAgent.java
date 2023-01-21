@@ -7,8 +7,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.pifi.core.Connectable.SchedulingAgent;
 
-final class TimerDrivenSchedulingAgent {
+final class TimerDrivenSchedulingAgent implements SchedulingAgent {
   private final long noWorkYieldNanos;
 
   protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -61,10 +62,10 @@ final class TimerDrivenSchedulingAgent {
         // Call the task. It will return a boolean indicating whether or not we should
         // yield
         // based on a lack of work for to do for the component.
-        final InvocationResult invocationResult = connectableTask.invoke();
-        if (invocationResult.isYield()) {
-          // log.debug("Yielding {} due to {}", connectable, invocationResult.getYieldExplanation());
-        }
+        // final InvocationResult invocationResult = connectableTask.invoke();
+        // if (invocationResult.isYield()) {
+        // // log.debug("Yielding {} due to {}", connectable, invocationResult.getYieldExplanation());
+        // }
 
         // If the component is yielded, cancel its future and re-submit it to run again
         // after the yield has expired.
@@ -96,7 +97,7 @@ final class TimerDrivenSchedulingAgent {
               }
             }
           }
-        } else if (noWorkYieldNanos > 0L && invocationResult.isYield()) {
+        } else if (noWorkYieldNanos > 0L) {// && invocationResult.isYield()) {
           // Component itself didn't yield but there was no work to do, so the framework
           // will choose
           // to yield the component automatically for a short period of time.
@@ -136,5 +137,17 @@ final class TimerDrivenSchedulingAgent {
 
   public void shutdown() {
     this.flowEngine.shutdown();
+  }
+
+  @Override
+  public void unschedule(com.pifi.core.Connectable connectable, com.pifi.core.LifecycleState scheduleState) {
+    for (final ScheduledFuture<?> future : scheduleState.getFutures()) {
+      // stop scheduling to run but do not interrupt currently running tasks.
+      future.cancel(false);
+
+    }
+
+    log.info("Stopped scheduling {} to run", connectable);
+
   }
 }

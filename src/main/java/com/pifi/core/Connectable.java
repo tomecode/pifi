@@ -55,6 +55,8 @@ public class Connectable {
 
   protected final AtomicReference<ScheduledState> scheduledState;
 
+  private final AtomicReference<List<CompletableFuture<Void>>> stopFutures = new AtomicReference<>(new ArrayList<>());
+
   private final String id;
 
   public Connectable(Processor processor, ProcessScheduler processScheduler) {
@@ -102,31 +104,21 @@ public class Connectable {
 
   // @Override
   public ScheduledState getScheduledState() {
-    // ScheduledState sc = this.scheduledState.get();
-    // if (sc == ScheduledState.STARTING) {
-    // final ValidationStatus validationStatus = getValidationStatus();
-    //
-    // if (validationStatus == ValidationStatus.INVALID) {
-    // return ScheduledState.STOPPED;
-    // } else {
-    // return ScheduledState.RUNNING;
-    // }
-    // } else if (sc == ScheduledState.STOPPING) {
-    // return ScheduledState.STOPPED;
-    // }
-    // // return sc;
-    return ScheduledState.RUNNING;
+    ScheduledState sc = this.scheduledState.get();
+    if (sc == ScheduledState.STARTING) {
+      // final ValidationStatus validationStatus = getValidationStatus();
+      //
+      // if (validationStatus == ValidationStatus.INVALID) {
+      // return ScheduledState.STOPPED;
+      // } else {
+      return ScheduledState.RUNNING;
+      // }
+    } else if (sc == ScheduledState.STOPPING) {
+      return ScheduledState.STOPPED;
+    }
+     return sc;
   }
 
-  /**
-   * Returns the physical state of this processor which includes transition states such as STOPPING
-   * and STARTING.
-   *
-   * @return the physical state of this processor [DISABLED, STOPPED, RUNNING, STARTING, STOPPING]
-   */
-  public ScheduledState getPhysicalScheduledState() {
-    return this.scheduledState.get();
-  }
 
   /**
    * @param relationshipName name
@@ -362,8 +354,9 @@ public class Connectable {
   /**
    * Will idempotently start the processor
    */
-  public void start(final ScheduledExecutorService taskScheduler, final long administrativeYieldMillis, final long processorStartTimeoutMillis,
-      final SchedulingAgentCallback schedulingAgentCallback) {
+  public void start(final ScheduledExecutorService taskScheduler, // final long administrativeYieldMillis,
+      long processorStartTimeoutMillis,
+      SchedulingAgentCallback schedulingAgentCallback) {
 
     ScheduledState desiredState = ScheduledState.RUNNING;
     ScheduledState scheduledState = ScheduledState.STARTING;
@@ -390,7 +383,8 @@ public class Connectable {
     // will ensure that the Processor represented by this node can only be started
     // once
     if (starting) {
-      initiateStart(taskScheduler, administrativeYieldMillis, processorStartTimeoutMillis, schedulingAgentCallback);
+      initiateStart(taskScheduler, // administrativeYieldMillis,
+          processorStartTimeoutMillis, schedulingAgentCallback);
     } else {
       final String procName = processorRef.get().toString();
       log.warn("Cannot start {} because it is not currently stopped. Current state is {}", procName, currentState);
@@ -401,7 +395,7 @@ public class Connectable {
     return processorRef.get();
   }
 
-  private void initiateStart(final ScheduledExecutorService taskScheduler, final long administrativeYieldMillis,
+  private void initiateStart(final ScheduledExecutorService taskScheduler, // final long administrativeYieldMillis,
       final long processorStartTimeoutMillis, final SchedulingAgentCallback schedulingAgentCallback) {
 
     final Processor processor = getProcessor();
@@ -517,15 +511,160 @@ public class Connectable {
   // }
   // }
 
-  public CompletableFuture<Void> stop(ProcessScheduler processScheduler, ScheduledExecutorService executor,
-      ProcessContext processContext, TimerDrivenSchedulingAgent schedulingAgent, LifecycleState scheduleState) {
-    // TODO Auto-generated method stub
-    return null;
+  public CompletableFuture<Void>
+      stop(final ProcessScheduler processScheduler, final ScheduledExecutorService executor,
+      // final ProcessContext processContext,
+      final SchedulingAgent schedulingAgent,
+      final LifecycleState lifecycleState) {
+
+    final Processor processor = processorRef.get();
+    log.info("Stopping processor: " + processor);
+    desiredState = ScheduledState.STOPPED;
+
+    final CompletableFuture<Void> future = new CompletableFuture<>();
+
+    addStopFuture(future);
+
+    // will ensure that the Processor represented by this node can only be stopped once
+    if (this.scheduledState.compareAndSet(ScheduledState.RUNNING, ScheduledState.STOPPING) // ||
+    // this.scheduledState.compareAndSet(ScheduledState.RUN_ONCE, ScheduledState.STOPPING)
+    ) {
+      lifecycleState.incrementActiveThreadCount(null);
+
+      // will continue to monitor active threads, invoking OnStopped once there are no
+      // active threads (with the exception of the thread performing shutdown operations)
+      executor.execute(new Runnable() {
+        @Override
+        public void run() {
+          try {
+            if (lifecycleState.isScheduled()) {
+              schedulingAgent.unschedule(Connectable.this, lifecycleState);
+
+              // activateThread();
+              // try (final NarCloseable nc =
+              // NarCloseable.withComponentNarLoader(getExtensionManager(), processor.getClass(),
+              // processor.getIdentifier())) {
+              // ReflectionUtils.quietlyInvokeMethodsWithAnnotation(OnUnscheduled.class, processor,
+              // processContext);
+              // } finally {
+              // deactivateThread();
+              // }
+            }
+
+            // all threads are complete if the active thread count is 1. This is because this thread that is
+            // performing the lifecycle actions counts as 1 thread.
+            final boolean allThreadsComplete = lifecycleState.getActiveThreadCount() == 1;
+            if (allThreadsComplete) {
+              // activateThread();
+              // try (final NarCloseable nc =
+              // NarCloseable.withComponentNarLoader(getExtensionManager(), processor.getClass(),
+              // processor.getIdentifier())) {
+              // ReflectionUtils.quietlyInvokeMethodsWithAnnotation(OnStopped.class, processor, processContext);
+              // } finally {
+              // deactivateThread();
+              // }
+
+              lifecycleState.decrementActiveThreadCount();
+              completeStopAction();
+
+              // // This can happen only when we join a cluster. In such a case, we can inherit a flow from the
+              // // cluster that says that
+              // // the Processor is to be running. However, if the Processor is already in the process of
+              // stopping,
+              // // we cannot immediately
+              // // start running the Processor. As a result, we check here, since the Processor is stopped, and
+              // then
+              // // immediately start the
+              // // Processor if need be.
+              // final ScheduledState desired = Connectable.this.desiredState;
+              // if (desired == ScheduledState.RUNNING) {
+              // log.info("Finished stopping {} but desired state is now RUNNING so will start processor", this);
+              // processScheduler.startProcessor(Connectable.this, true);
+              // } else if (desired == ScheduledState.DISABLED) {
+              // final boolean updated = scheduledState.compareAndSet(ScheduledState.STOPPED,
+              // ScheduledState.DISABLED);
+              //
+              // if (updated) {
+              // log.info("Finished stopping {} but desired state is now DISABLED so disabled processor", this);
+              // } else {
+              // log.info(
+              // "Finished stopping {} but desired state is now DISABLED. Scheduled State could not be
+              // transitioned from STOPPED to DISABLED, " +
+              // "though, so will allow the other thread to finish state transition. Current state is {}",
+              // this, scheduledState.get());
+              // }
+              // }
+            } else {
+              // Not all of the active threads have finished. Try again in 100 milliseconds.
+              executor.schedule(this, 100, TimeUnit.MILLISECONDS);
+            }
+          } catch (final Exception e) {
+            log.warn("Failed while shutting down processor " + processor, e);
+          }
+        }
+      });
+    } else {
+      // We do compareAndSet() instead of set() to ensure that Processor
+      // stoppage is handled consistently including a condition where
+      // Processor never got a chance to transition to RUNNING state
+      // before stop() was called. If that happens the stop processor
+      // routine will be initiated in start() method, otherwise the IF
+      // part will handle the stop processor routine.
+      final boolean updated = this.scheduledState.compareAndSet(ScheduledState.STARTING, ScheduledState.STOPPING);
+      if (updated) {
+        log.debug("Transitioned state of {} from STARTING to STOPPING", this);
+      }
+    }
+
+    return future;
+  }
+
+
+  public interface SchedulingAgent {
+
+
+    void unschedule(Connectable connectable, LifecycleState scheduleState);
+    void shutdown();
+
+  }
+
+
+  /**
+   * Marks the processor as fully stopped, and completes any futures that are to be completed as a
+   * result
+   */
+  private void completeStopAction() {
+    synchronized (this.stopFutures) {
+      log.info("{} has completely stopped. Completing any associated Futures.", this);
+      this.hasActiveThreads = false;
+      this.scheduledState.set(ScheduledState.STOPPED);
+
+      final List<CompletableFuture<Void>> futures = this.stopFutures.getAndSet(new ArrayList<>());
+      futures.forEach(f -> f.complete(null));
+    }
+  }
+
+
+
+  /**
+   * Adds the given CompletableFuture to the list of those that will completed whenever the processor
+   * has fully stopped
+   * 
+   * @param future the future to add
+   */
+  private void addStopFuture(final CompletableFuture<Void> future) {
+    synchronized (this.stopFutures) {
+      if (scheduledState.get() == ScheduledState.STOPPED) {
+        future.complete(null);
+      } else {
+        stopFutures.get().add(future);
+      }
+    }
   }
 
   public ScheduledState getDesiredState() {
-    // TODO Auto-generated method stub
-    return null;
+    return this.desiredState;
+
   }
 
 

@@ -14,7 +14,6 @@ final class ProcessScheduler {
 
   private static final Logger log = LoggerFactory.getLogger(ProcessScheduler.class);
 
-  private final long administrativeYieldMillis;
   private final long processorStartTimeoutMillis;
 
   private final ScheduledExecutorService frameworkTaskExecutor;
@@ -31,7 +30,6 @@ final class ProcessScheduler {
     this.componentLifeCycleThreadPool = componentLifecycleThreadPool;
     this.schedulingAgent = timerDrivenSchedulingAgent;
 
-    administrativeYieldMillis = 30000l; // MILLISECONDS
     processorStartTimeoutMillis = 12000;//
     frameworkTaskExecutor = new FlowEngine(1, "Framework Task Thread");
   }
@@ -41,41 +39,6 @@ final class ProcessScheduler {
     this.schedulingAgent.shutdown();
     frameworkTaskExecutor.shutdown();
     componentLifeCycleThreadPool.shutdown();
-  }
-
-  /**
-   * start given processor
-   * 
-   * @param procNode
-   * @return
-   */
-  public synchronized CompletableFuture<Void> startProcessor(final Connectable procNode) {
-    final LifecycleState lifecycleState = getLifecycleState(procNode, true);
-
-    final CompletableFuture<Void> future = new CompletableFuture<>();
-    final SchedulingAgentCallback callback = new SchedulingAgentCallback() {
-      @Override
-      public void trigger() {
-        lifecycleState.clearTerminationFlag();
-        schedulingAgent.doSchedule(procNode, lifecycleState);
-        future.complete(null);
-      }
-
-      @Override
-      public Future<?> scheduleTask(final Callable<?> task) {
-        lifecycleState.incrementActiveThreadCount(null);
-        return componentLifeCycleThreadPool.submit(task);
-      }
-
-      @Override
-      public void onTaskComplete() {
-        lifecycleState.decrementActiveThreadCount();
-      }
-    };
-
-    log.info("Starting {}", procNode);
-    procNode.start(componentMonitoringThreadPool, administrativeYieldMillis, processorStartTimeoutMillis, callback);
-    return future;
   }
 
   private final LifecycleState getLifecycleState(final Object schedulable, final boolean replaceTerminatedState) {
@@ -111,13 +74,51 @@ final class ProcessScheduler {
   }
 
   /**
+   * start given processor
+   * 
+   * @param procNode
+   * @return
+   */
+  public synchronized CompletableFuture<Void> startProcessor(final Connectable procNode) {
+    final LifecycleState lifecycleState = getLifecycleState(procNode, true);
+
+    final CompletableFuture<Void> future = new CompletableFuture<>();
+    final SchedulingAgentCallback callback = new SchedulingAgentCallback() {
+      @Override
+      public void trigger() {
+        lifecycleState.clearTerminationFlag();
+        schedulingAgent.doSchedule(procNode, lifecycleState);
+        future.complete(null);
+      }
+
+      @Override
+      public Future<?> scheduleTask(final Callable<?> task) {
+        lifecycleState.incrementActiveThreadCount(null);
+        return componentLifeCycleThreadPool.submit(task);
+      }
+
+      @Override
+      public void onTaskComplete() {
+        lifecycleState.decrementActiveThreadCount();
+      }
+    };
+
+    log.info("Starting {}", procNode);
+    procNode.start(componentMonitoringThreadPool, // administrativeYieldMillis,
+        processorStartTimeoutMillis, callback);
+    return future;
+  }
+
+  /**
+   * stop given processor
    * 
    * @param processor
    * @return
    */
   public Future<Void> stopProcessor(Connectable processor) {
+    final LifecycleState lifecycleState = getLifecycleState(processor, false);
 
-    return null;
+    return processor.stop(this, this.componentLifeCycleThreadPool, schedulingAgent, lifecycleState);
   }
 
 

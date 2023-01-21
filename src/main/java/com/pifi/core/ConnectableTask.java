@@ -69,14 +69,14 @@ final class ConnectableTask {
     final long startNanos = System.nanoTime();
     // final long finishIfBackpressureEngaged = startNanos + (batchNanos / 25L);
     final long finishNanos = startNanos + batchNanos;
-    int invocationCount = 0;
+//    int invocationCount = 0;
 
     final String originalThreadName = Thread.currentThread().getName();
     try {
-      boolean shouldRun = true;// connectable.getScheduledState() == ScheduledState.RUNNING;
+      boolean shouldRun = connectable.getScheduledState() == ScheduledState.RUNNING;
       // || connectable.getScheduledState() == ScheduledState.RUN_ONCE;
       while (shouldRun) {
-        invocationCount++;
+        //invocationCount++;
         connectable.onTrigger(session);
 
         final long nanoTime = System.nanoTime();
@@ -85,8 +85,7 @@ final class ConnectableTask {
         }
 
         if (!isWorkToDo()) {
-          // return InvocationResult.DO_NOT_YIELD;
-          break;
+          return InvocationResult.DO_NOT_YIELD;
         }
       }
     } catch (final Throwable e) {
